@@ -67,16 +67,17 @@ func Whois(domain string, servers ...string) (result string, err error) {
 
 func query(domain string, servers ...string) (result string, err error) {
     var server string
-    if len(servers) == 0 || servers[0] == "" {
-        domains := strings.SplitN(domain, ".", 2)
-        if len(domains) != 2 {
-            err = fmt.Errorf("Domain %s is invalid.", domain)
-            return
-        }
-        server = domains[1] + "." + WHOIS_DOMAIN
-    } else {
-        server = servers[0]
-    }
+	if len(servers) == 0 || servers[0] == "" {
+		domains := strings.Split(domain, ".")
+		domain_len := len(domains)
+		if domain_len < 2 {
+			err = fmt.Errorf("Domain %s is invalid.", domain)
+			return
+		}
+		server = domains[domain_len-1] + "." + WHOIS_DOMAIN
+	} else {
+		server = servers[0]
+	}
 
     conn, err := net.DialTimeout("tcp", net.JoinHostPort(server, WHOIS_PORT), time.Second * 30)
     if err != nil {
@@ -93,5 +94,5 @@ func query(domain string, servers ...string) (result string, err error) {
     conn.Close()
     result = string(buffer[:])
 
-    return 
+    return
 }
